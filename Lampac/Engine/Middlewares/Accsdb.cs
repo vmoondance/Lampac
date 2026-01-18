@@ -94,12 +94,14 @@ namespace Lampac.Engine.Middlewares
 
             if (AppInit.conf.accsdb.enable || (!requestInfo.IsLocalIp && !AppInit.conf.WAF.allowExternalIpAccess))
             {
+                if (httpContext.Request.Path.Value.StartsWith("/e/"))
+                    return _next(httpContext);
+
                 var accsdb = AppInit.conf.accsdb;
 
                 if (httpContext.Request.Path.Value.StartsWith("/testaccsdb") && accsdb.shared_passwd != null && requestInfo.user_uid == accsdb.shared_passwd)
                 {
                     requestInfo.IsLocalRequest = true;
-                    httpContext.Features.Set(requestInfo);
                     return _next(httpContext);
                 }
 
@@ -109,7 +111,6 @@ namespace Lampac.Engine.Middlewares
                 if (!string.IsNullOrEmpty(accsdb.whitepattern) && Regex.IsMatch(httpContext.Request.Path.Value, accsdb.whitepattern, RegexOptions.IgnoreCase))
                 {
                     requestInfo.IsAnonymousRequest = true;
-                    httpContext.Features.Set(requestInfo);
                     return _next(httpContext);
                 }
 

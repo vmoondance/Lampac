@@ -426,7 +426,7 @@ namespace Lampac.Controllers
                     string sharedBlock = string.Empty;
                     if (IO.File.Exists("isdocker") == false)
                     {
-                        string shared_passwd = CrypTo.unic(6).ToLower();
+                        string shared_passwd = CrypTo.unic(8).ToLower();
 
                         UpdateInitConf(j =>
                         {
