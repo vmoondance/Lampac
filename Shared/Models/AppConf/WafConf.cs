@@ -4,6 +4,8 @@
     {
         public bool enable { get; set; }
 
+        public bool bruteForceProtection { get; set; }
+
         public List<string> whiteIps { get; set; }
 
         public int limit_req { get; set; }
@@ -11,7 +13,7 @@
         /// <summary>
         /// uri_pattern: limit_req
         /// </summary>
-        public Dictionary<string, int> limit_map { get; set; }
+        public Dictionary<string, WafLimitMap> limit_map { get; set; }
 
         public List<string> ipsDeny { get; set; }
 
@@ -25,5 +27,13 @@
         /// header_key: regex
         /// </summary>
         public Dictionary<string, string> headersDeny { get; set; }
+    }
+
+
+    public class WafLimitMap
+    {
+        public int limit { get; set; }
+
+        public int second { get; set; }
     }
 }

@@ -412,7 +412,15 @@ namespace Shared
 
         public StaticacheConf Staticache { get; set; } = new StaticacheConf();
 
-        public WafConf WAF = new WafConf();
+        public WafConf WAF = new WafConf()
+        {
+            enable = true,
+            bruteForceProtection = true,
+            limit_map = new Dictionary<string, WafLimitMap>() 
+            {
+                [".*"] = new WafLimitMap() { limit = 5, second = 1 }
+            }
+        };
 
         public WebLogConf weblog = new WebLogConf();
 
