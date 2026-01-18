@@ -37,7 +37,7 @@ namespace Lampac.Engine.Middlewares
                 return _next(httpContext);
 
             #region BruteForce
-            if (waf.bruteForceProtection && !Shared.Engine.Utilities.IPNetwork.IsLocalIp(requestInfo.IP))
+            if (waf.bruteForceProtection && !requestInfo.IsLocalIp)
             {
                 var ids = memoryCache.GetOrCreate($"WAF:BruteForce:{requestInfo.IP}", entry =>
                 {

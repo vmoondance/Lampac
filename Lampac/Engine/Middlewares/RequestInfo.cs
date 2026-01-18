@@ -99,6 +99,7 @@ namespace Lampac.Engine.Middlewares
             var req = new RequestModel()
             {
                 IsLocalRequest = IsLocalRequest,
+                IsLocalIp = Shared.Engine.Utilities.IPNetwork.IsLocalIp(clientIp),
                 IP = clientIp,
                 Country = cf_country,
                 Path = httpContext.Request.Path.Value,

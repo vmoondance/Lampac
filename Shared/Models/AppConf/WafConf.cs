@@ -1,4 +1,6 @@
-﻿namespace Shared.Models.AppConf
+﻿using Newtonsoft.Json;
+
+namespace Shared.Models.AppConf
 {
     public class WafConf
     {
@@ -11,8 +13,9 @@
         public int limit_req { get; set; }
 
         /// <summary>
-        /// uri_pattern: limit_req
+        /// uri_pattern: WafLimitMap
         /// </summary>
+        [JsonProperty("limit_map", ObjectCreationHandling = ObjectCreationHandling.Replace, NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, WafLimitMap> limit_map { get; set; }
 
         public List<string> ipsDeny { get; set; }
@@ -26,6 +29,7 @@
         /// <summary>
         /// header_key: regex
         /// </summary>
+        [JsonProperty("headersDeny", ObjectCreationHandling = ObjectCreationHandling.Replace, NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, string> headersDeny { get; set; }
     }
 

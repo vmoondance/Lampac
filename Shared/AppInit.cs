@@ -575,7 +575,7 @@ namespace Shared
             denyMesage = "Добавьте {account_email} в init.conf или через {host}/admin",
             denyGroupMesage = "У вас нет прав для просмотра этой страницы",
             expiresMesage = "Время доступа для {account_email} истекло в {expires}",
-            maxip_hour = 15, maxrequest_hour = 500, maxlock_day = 3, blocked_hour = 36,
+            maxip_hour = 10, maxrequest_hour = 400, maxlock_day = 3, blocked_hour = 36,
             shared_daytime = 366*10, // 10 years
         };
 
