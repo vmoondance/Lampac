@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 using Shared;
 using Shared.Models;
 using System;
@@ -157,34 +158,18 @@ namespace Lampac.Engine.Middlewares
         }
 
 
+        static readonly string[] uids = ["token", "account_email", "uid", "box_mac"];
+
         static string getuid(HttpContext httpContext)
         {
-            if (httpContext.Request.Query.ContainsKey("token"))
+            foreach (string id in uids)
             {
-                string val = httpContext.Request.Query["token"].ToString();
-                if (!string.IsNullOrEmpty(val))
-                    return val;
-            }
-
-            if (httpContext.Request.Query.ContainsKey("account_email"))
-            {
-                string val = httpContext.Request.Query["account_email"].ToString();
-                if (!string.IsNullOrEmpty(val))
-                    return val;
-            }
-
-            if (httpContext.Request.Query.ContainsKey("uid"))
-            {
-                string val = httpContext.Request.Query["uid"].ToString();
-                if (!string.IsNullOrEmpty(val))
-                    return val;
-            }
-
-            if (httpContext.Request.Query.ContainsKey("box_mac"))
-            {
-                string val = httpContext.Request.Query["box_mac"].ToString();
-                if (!string.IsNullOrEmpty(val))
-                    return val;
+                if (httpContext.Request.Query.ContainsKey(id))
+                {
+                    StringValues val = httpContext.Request.Query[id];
+                    if (val.Count > 0)
+                        return Regex.Replace(val, "[^a-z0-9_+\\.\\-\\@\\=]", "", RegexOptions.IgnoreCase);
+                }
             }
 
             return null;

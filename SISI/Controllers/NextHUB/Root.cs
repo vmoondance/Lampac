@@ -28,6 +28,8 @@ namespace SISI.Controllers.NextHUB
             if (string.IsNullOrEmpty(plugin))
                 return null;
 
+            plugin = Regex.Replace(plugin, "[^a-z0-9\\-]+", "", RegexOptions.IgnoreCase);
+
             if (AppInit.conf.sisi.NextHUB_sites_enabled != null && !AppInit.conf.sisi.NextHUB_sites_enabled.Contains(plugin))
                 return null;
 

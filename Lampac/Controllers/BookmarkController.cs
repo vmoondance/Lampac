@@ -70,7 +70,7 @@ namespace Lampac.Controllers
                 string profile_id = getProfileid(requestInfo, HttpContext);
                 string id = requestInfo.user_uid + profile_id;
 
-                string md5key = AppInit.conf.storage.md5name ? CrypTo.md5(id) : Regex.Replace(id, "(\\@|_)", "");
+                string md5key = AppInit.conf.storage.md5name ? CrypTo.md5(id) : Regex.Replace(id, "[^a-z0-9\\-]", "");
                 string storageFile = $"database/storage/sync_favorite/{md5key.Substring(0, 2)}/{md5key.Substring(2)}";
 
                 if (System.IO.File.Exists(storageFile) && !System.IO.File.Exists($"{storageFile}.migration"))

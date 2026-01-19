@@ -52,6 +52,56 @@ namespace Lampac.Controllers
             </div>
         </div>
     </div>
+    <div class='container mt-5' style='margin-bottom: 2em;'>
+        <div class='card mt-4'>
+            <div class='card-body'>
+                <p class='card-text'>Персональные пароли для плагинов, пример пароля <b>kitty</b>:</p>
+<pre style='background: #e9ecef; padding: 1em;'><code>""accsdb"": {{
+  ""accounts"": {{
+    ""kitty"": ""2040-10-17T00:00:00"", 
+  }}
+}}</code></pre>
+				<br>
+                <p class='card-text'>Или через <a href='/admin' target='_blank'>{host}/admin</a> > Пользователи > Добавить пользователя > В ID указать <b>kitty</b></p>
+
+				<br>
+                    <p class='card-text'>Все плагины сразу
+                    <br>
+                    http://IP:9118/on/js/kitty
+                    </p>
+
+                    <p class='card-text'>Онлайн
+                    <br>
+                    http://IP:9118/online/js/kitty
+                    </p>
+
+                    <p class='card-text'>Клубничка
+                    <br>
+                    http://IP:9118/sisi/js/kitty
+                    </p>
+
+                    <p class='card-text'>DLNA
+                    <br>
+                    http://IP:9118/dlna/js/kitty
+                    </p>
+
+                    <p class='card-text'>Таймкоды
+                    <br>
+                    http://IP:9118/timecode/js/kitty
+                    </p>
+
+                    <p class='card-text'>Tracks и Транскодинг
+                    <br>
+                    http://IP:9118/tracks/js/kitty
+                    </p>
+
+                    <p class='card-text'>TorrServer
+                    <br>
+                    http://IP:9118/ts/js/kitty
+                    </p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>");
         }

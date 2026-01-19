@@ -49,17 +49,7 @@ namespace Shared.Engine
             if (string.IsNullOrEmpty(s))
                 return;
 
-            ReadOnlySpan<char> span = s.AsSpan();
-
-            // Trim без аллокаций
-            int start = 0;
-            int end = span.Length - 1;
-
-            while (start <= end && char.IsWhiteSpace(span[start])) start++;
-            while (end >= start && char.IsWhiteSpace(span[end])) end--;
-
-            if (start > end)
-                return;
+            ReadOnlySpan<char> span = s.AsSpan().Trim();
 
             sb.Append(split);
             if (split == '?')
@@ -68,7 +58,7 @@ namespace Shared.Engine
             sb.Append(key);
             sb.Append('=');
 
-            AppendUrlEncodedLowerInvariant(sb, span.Slice(start, end - start + 1));
+            AppendUrlEncodedLowerInvariant(sb, span);
         }
 
         static void AppendUrlEncodedLowerInvariant(StringBuilder sb, ReadOnlySpan<char> value)
@@ -78,6 +68,9 @@ namespace Shared.Engine
             for (int i = 0; i < value.Length; i++)
             {
                 char ch = char.ToLowerInvariant(value[i]);
+
+                if (!IsAllowedChar(ch))
+                    continue;
 
                 if (IsUnreserved(ch))
                 {
@@ -112,7 +105,12 @@ namespace Shared.Engine
         static bool IsUnreserved(char c) 
             => (c >= 'a' && c <= 'z')
             || (c >= '0' && c <= '9')
-            || c == '-' || c == '_' || c == '.' || c == '~';
+            || c == '-' || c == '_' || c == '.';
+
+        static bool IsAllowedChar(char c)
+            => (c >= 'a' && c <= 'z')
+            || (c >= '0' && c <= '9')
+            || c == '@' || c == '.' || c == '-' || c == '_' || c == '=';
 
         static readonly string encodedHex = "0123456789ABCDEF";
 

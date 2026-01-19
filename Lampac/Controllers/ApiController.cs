@@ -219,6 +219,10 @@ namespace Lampac.Controllers
                     type = AppInit.conf.LampaWeb.index.Split("/")[0];
                 }
             }
+            else
+            {
+                type = Regex.Replace(type, "[^a-z0-9\\-]", "", RegexOptions.IgnoreCase);
+            }
 
             bool usecubproxy = AppInit.conf.cub.enabled(requestInfo.Country);
             var apr = AppInit.conf.LampaWeb.appReplace ?? InvkEvent.conf?.Controller?.AppReplace?.appjs?.regex;
@@ -324,6 +328,10 @@ namespace Lampac.Controllers
 
                     type = AppInit.conf.LampaWeb.index.Split("/")[0];
                 }
+            }
+            else
+            {
+                type = Regex.Replace(type, "[^a-z0-9\\-]", "", RegexOptions.IgnoreCase);
             }
 
             var apr = AppInit.conf.LampaWeb.cssReplace ?? InvkEvent.conf?.Controller?.AppReplace?.appcss?.regex;

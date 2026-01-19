@@ -15,7 +15,8 @@ namespace Catalog
             if (string.IsNullOrEmpty(site))
                 return null;
 
-            site = site.Trim().ToLowerInvariant();
+            site = site.ToLowerAndTrim();
+            site = Regex.Replace(site, "[^a-z0-9\\-]", "", RegexOptions.IgnoreCase);
 
             var hybridCache = new HybridCache();
 
@@ -105,7 +106,7 @@ namespace Catalog
                         var dict = deserializer.Deserialize<Dictionary<object, object>>(yaml);
                         if (dict != null && dict.TryGetValue("displayname", out var dnObj) && dnObj != null)
                         {
-                            var dn = dnObj.ToString().Trim().ToLowerInvariant();
+                            var dn = dnObj.ToString().ToLowerAndTrim();
                             if (dn == site)
                                 return Path.GetFileNameWithoutExtension(file);
                         }

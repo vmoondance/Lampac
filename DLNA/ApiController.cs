@@ -643,7 +643,7 @@ namespace DLNA.Controllers
             if (path.EndsWith(".jpg"))
                 contentType = "image/jpeg";
 
-            return File(IO.File.OpenRead($"{dlna_path}/" + path), contentType, true);
+            return File(IO.File.OpenRead($"{dlna_path}/{path}"), contentType, true);
         }
         #endregion
 
@@ -657,13 +657,13 @@ namespace DLNA.Controllers
 
             try
             {
-                IO.File.Delete($"{dlna_path}/" + path);
+                IO.File.Delete($"{dlna_path}/{path}");
             }
             catch { }
 
             try
             {
-                Directory.Delete($"{dlna_path}/" + path, true);
+                Directory.Delete($"{dlna_path}/{path}", true);
             }
             catch { }
 

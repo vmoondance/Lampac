@@ -28,6 +28,9 @@ namespace Lampac.Controllers
         [Route("/storage/get")]
         async public Task<ActionResult> Get(string path, string pathfile, bool responseInfo)
         {
+            if (!AppInit.conf.storage.enable)
+                return ContentTo("{\"success\": false, \"msg\": \"disabled\"}");
+
             string outFile = getFilePath(path, pathfile, false);
             if (outFile == null || !IO.File.Exists(outFile))
                 return ContentTo("{\"success\": false, \"msg\": \"outFile\"}");
@@ -158,6 +161,9 @@ namespace Lampac.Controllers
         [Route("/storage/temp/{key}")]
         async public Task<ActionResult> TempGet(string key, bool responseInfo)
         {
+            if (!AppInit.conf.storage.enable)
+                return ContentTo("{\"success\": false, \"msg\": \"disabled\"}");
+
             string outFile = getFilePath("temp", null, false, user_uid: key);
             if (outFile == null || !IO.File.Exists(outFile))
                 return ContentTo("{\"success\": false, \"msg\": \"outFile\"}");
@@ -272,12 +278,14 @@ namespace Lampac.Controllers
             if (path == "temp" && string.IsNullOrEmpty(user_uid))
                 return null;
 
+            path = Regex.Replace(path, "[^a-z0-9\\-]", "", RegexOptions.IgnoreCase);
+
             string id = user_uid ?? requestInfo.user_uid;
             if (string.IsNullOrEmpty(id))
                 return null;
 
             id += pathfile;
-            string md5key = AppInit.conf.storage.md5name ? CrypTo.md5(id) : Regex.Replace(id, "(\\@|_)", "");
+            string md5key = AppInit.conf.storage.md5name ? CrypTo.md5(id) : Regex.Replace(id, "[^a-z0-9\\-]", "");
 
             if (path == "temp")
             {

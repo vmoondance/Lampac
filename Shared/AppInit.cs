@@ -418,7 +418,7 @@ namespace Shared
             bruteForceProtection = true,
             limit_map = new Dictionary<string, WafLimitMap>()
             {
-                ["^/(tmdb|cub|dlna|transcoding|ts|proxy)"] = new WafLimitMap() { limit = 40, second = 1 },
+                ["^/(tmdb|cub|dlna|transcoding|ts|proxy)"] = new WafLimitMap() { limit = 50, second = 1 },
                 [".*"] = new WafLimitMap() { limit = 10, second = 1 }
             }
         };
