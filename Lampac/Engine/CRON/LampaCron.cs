@@ -43,23 +43,25 @@ namespace Lampac.Engine.CRON
                     if (istree && File.Exists("wwwroot/lampa-main/tree") && init.tree == File.ReadAllText("wwwroot/lampa-main/tree"))
                         return false;
 
-                    string gitapp = await Http.Get($"https://raw.githubusercontent.com/{init.git}/{(istree ? init.tree : "main")}/app.min.js", weblog: false);
-                    if (gitapp == null || !gitapp.Contains("author: 'Yumata'"))
-                        return false;
+                    bool changeversion = false;
 
-                    if (currentapp == null)
+                    await Http.GetSpan(gitapp => 
                     {
-                        currentapp = File.ReadAllText("wwwroot/lampa-main/app.min.js");
-                        currentapp = CrypTo.md5(currentapp);
-                    }
+                        if (!gitapp.Contains("author: 'Yumata'", StringComparison.Ordinal))
+                            return;
 
-                    if (CrypTo.md5(gitapp) != currentapp)
-                        return true;
+                        if (currentapp == null)
+                            currentapp = CrypTo.md5File("wwwroot/lampa-main/app.min.js");
+
+                        if (!string.IsNullOrEmpty(currentapp) && CrypTo.md5(gitapp) != currentapp)
+                            changeversion = true;
+
+                    }, $"https://raw.githubusercontent.com/{init.git}/{(istree ? init.tree : "main")}/app.min.js", weblog: false);
 
                     if (istree)
                         File.WriteAllText("wwwroot/lampa-main/tree", init.tree);
 
-                    return false;
+                    return changeversion;
                 }
 
                 if (await update())

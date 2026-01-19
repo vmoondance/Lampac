@@ -36,7 +36,7 @@ namespace Lampac.Controllers
   }}
 }}</code></pre>
 				<br>
-                <p class='card-text'>Или через <a href='admin' target='_blank'>{host}/admin</a> > Пользователи > Добавить пользователя > В ID указать email/unic_id</p>
+                <p class='card-text'>Или через <a href='/admin' target='_blank'>{host}/admin</a> > Пользователи > Добавить пользователя > В ID указать email/unic_id</p>
             </div>
         </div>
     </div>

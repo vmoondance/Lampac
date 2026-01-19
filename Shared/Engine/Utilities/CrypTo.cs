@@ -36,6 +36,31 @@ namespace Shared.Engine
             }
         }
 
+        public static string md5File(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return string.Empty;
+
+            try
+            {
+                Span<byte> hash = stackalloc byte[16];
+
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, PoolInvk.bufferSize, FileOptions.SequentialScan))
+                {
+                    int bytesWritten = MD5.HashData(stream, hash);
+                    if (bytesWritten != 16)
+                        return string.Empty;
+                }
+
+                Span<char> hex = stackalloc char[32];
+                if (!Convert.TryToHexStringLower(hash, hex, out _))
+                    return string.Empty;
+
+                return new string(hex);
+            }
+            catch { return string.Empty; }
+        }
+
         public static byte[] md5binary(string text)
         {
             if (text == null)

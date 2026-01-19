@@ -637,13 +637,13 @@ namespace Lampac.Engine.Middlewares
             {
                 foreach (var header in headers)
                 {
-                    if (header.Key.StartsWith("server", StringComparison.OrdinalIgnoreCase) || 
-                        header.Key.StartsWith("transfer-encoding", StringComparison.OrdinalIgnoreCase) ||
-                        header.Key.StartsWith("etag", StringComparison.OrdinalIgnoreCase) ||
-                        header.Key.StartsWith("connection", StringComparison.OrdinalIgnoreCase) ||
-                        header.Key.StartsWith("content-security-policy", StringComparison.OrdinalIgnoreCase) ||
-                        header.Key.StartsWith("content-disposition", StringComparison.OrdinalIgnoreCase) ||
-                        header.Key.StartsWith("content-length", StringComparison.OrdinalIgnoreCase))
+                    if (header.Key.Equals("server", StringComparison.OrdinalIgnoreCase) || 
+                        header.Key.Equals("transfer-encoding", StringComparison.OrdinalIgnoreCase) ||
+                        header.Key.Equals("etag", StringComparison.OrdinalIgnoreCase) ||
+                        header.Key.Equals("connection", StringComparison.OrdinalIgnoreCase) ||
+                        header.Key.Equals("content-security-policy", StringComparison.OrdinalIgnoreCase) ||
+                        header.Key.Equals("content-disposition", StringComparison.OrdinalIgnoreCase) ||
+                        header.Key.Equals("content-length", StringComparison.OrdinalIgnoreCase))
                         continue;
 
                     if (header.Key.StartsWith("x-", StringComparison.OrdinalIgnoreCase) || 

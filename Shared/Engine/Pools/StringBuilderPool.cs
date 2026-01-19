@@ -39,7 +39,7 @@ namespace Shared.Engine.Pools
             if (sb == null)
                 return;
 
-            if (sb.Capacity > PoolInvk.rentCharMax)
+            if (sb.Capacity > PoolInvk.rentCharMax || _pool.Count >= 5)
             {
                 Interlocked.Increment(ref GC);
             }
