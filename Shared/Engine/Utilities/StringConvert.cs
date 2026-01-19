@@ -74,7 +74,7 @@ namespace Shared.Engine
 
         public static string SearchName(ReadOnlySpan<char> val, string empty = null)
         {
-            if (val.IsEmpty || val.Length == 0)
+            if (val.IsEmpty || val.Length == 0 || val.Length > _rentedSearchName.Length)
                 return empty;
 
             lock (_rentedSearchName)

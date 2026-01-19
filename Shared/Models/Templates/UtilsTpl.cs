@@ -5,7 +5,7 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Shared.Models.Templates
 {
-    public static unsafe class UtilsTpl
+    public static class UtilsTpl
     {
         #region HtmlEncode
         public static void HtmlEncode(ReadOnlySpan<char> value, StringBuilder sb)
@@ -26,40 +26,41 @@ namespace Shared.Models.Templates
         #endregion
 
         #region WriteJson
-        static readonly MemoryStream _msJson = new MemoryStream(PoolInvk.rentMax);
-
         public static void WriteJson<T>(StringBuilder sb, in T value, JsonTypeInfo<T> options)
         {
-            _msJson.SetLength(0);
-            _msJson.Position = 0;
-
-            using (var writer = new Utf8JsonWriter(_msJson, new JsonWriterOptions
+            using (var msm = PoolInvk.msm.GetStream())
             {
-                Indented = false,
-                SkipValidation = true
-            }))
-            {
-                JsonSerializer.Serialize(writer, value, options);
-            }
-
-            if (_msJson.TryGetBuffer(out ArraySegment<byte> buffer))
-            {
-                ReadOnlySpan<byte> utf8 = buffer.AsSpan(0, (int)_msJson.Length);
-
-                int neededChars = Encoding.UTF8.GetCharCount(utf8);
-
-                nint rentedJsonPtr = (nint)NativeMemory.Alloc((nuint)neededChars, (nuint)sizeof(char));
-
-                try
+                using (var writer = new Utf8JsonWriter((Stream)msm, new JsonWriterOptions
                 {
-                    Span<char> rentedChars = new Span<char>((void*)rentedJsonPtr, neededChars);
-                    int charsWritten = Encoding.UTF8.GetChars(utf8, rentedChars);
-                    if (charsWritten > 0)
-                        sb.Append(rentedChars.Slice(0, charsWritten));
+                    Indented = false,
+                    SkipValidation = true
+                }))
+                {
+                    JsonSerializer.Serialize(writer, value, options);
                 }
-                finally
+
+                if (msm.TryGetBuffer(out ArraySegment<byte> buffer))
                 {
-                    NativeMemory.Free((void*)rentedJsonPtr);
+                    ReadOnlySpan<byte> utf8 = buffer.AsSpan(0, (int)msm.Length);
+
+                    int neededChars = Encoding.UTF8.GetCharCount(utf8);
+
+                    unsafe
+                    {
+                        nint rentedJsonPtr = (nint)NativeMemory.Alloc((nuint)neededChars, (nuint)sizeof(char));
+
+                        try
+                        {
+                            Span<char> rentedChars = new Span<char>((void*)rentedJsonPtr, neededChars);
+                            int charsWritten = Encoding.UTF8.GetChars(utf8, rentedChars);
+                            if (charsWritten > 0)
+                                sb.Append(rentedChars.Slice(0, charsWritten));
+                        }
+                        finally
+                        {
+                            NativeMemory.Free((void*)rentedJsonPtr);
+                        }
+                    }
                 }
             }
         }
