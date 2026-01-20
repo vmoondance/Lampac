@@ -54,20 +54,16 @@ namespace Lampac.Engine.Middlewares
             //fileWatcher.Created += (s, e) => { cacheFiles.TryAdd(e.Name, 0); };
             fileWatcher.Deleted += (s, e) => { cacheFiles.TryRemove(e.Name, out _); };
 
-            cleanupTimer = new Timer(cleanup, null, TimeSpan.FromMinutes(60), TimeSpan.FromMinutes(60));
+            cleanupTimer = new Timer(cleanup, null, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(20));
         }
 
         static void cleanup(object state)
         {
             try
             {
-                string[] files = Directory.GetFiles("cache/tmdb", "*")
-                    .Select(Path.GetFileName)
-                    .ToArray();
-
-                foreach (string md5fileName in cacheFiles.Keys.ToArray())
+                foreach (string md5fileName in cacheFiles.Keys)
                 {
-                    if (!files.Contains(md5fileName))
+                    if (!File.Exists(Path.Combine("cache", "tmdb", md5fileName)))
                         cacheFiles.TryRemove(md5fileName, out _);
                 }
             }

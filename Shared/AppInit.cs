@@ -469,7 +469,7 @@ namespace Shared
 
             // false - GC старается возвращать высвобождённую виртуальную память ОС
             // true - GC сохраняет адресное пространство/сегменты, чтобы быстрее переиспользовать
-            RetainVM = true,
+            RetainVM = false,
 
             // false — только Stop-the-World сборки
             // true  — фоновые (concurrent) сборки

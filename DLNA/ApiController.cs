@@ -773,10 +773,9 @@ namespace DLNA.Controllers
                 if (data.IsEmpty)
                     return Json(new { error = "DownloadMetadata" });
 
-                var array = data.Span.ToArray();
-                IO.File.WriteAllBytes($"cache/torrent/{hash}", array);
+                IO.File.WriteAllBytes($"cache/torrent/{hash}", data.Span);
 
-                return Json(Torrent.Load(array).Files.Select(i => new { i.Path }));
+                return Json(Torrent.Load(data.Span).Files.Select(i => new { i.Path }));
             }
             catch (Exception ex)
             {

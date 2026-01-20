@@ -7,7 +7,7 @@ namespace Shared.Engine
     {
         #region static
         private static readonly ConcurrentDictionary<string, SemaphoreEntry> _semaphoreLocks = new();
-        private static readonly Timer _cleanupTimer = new(_ => Cleanup(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        private static readonly Timer _cleanupTimer = new(_ => Cleanup(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
         public static int Stat_ContSemaphoreLocks => _semaphoreLocks.IsEmpty ? 0 : _semaphoreLocks.Count;
 
@@ -19,9 +19,10 @@ namespace Shared.Engine
 
             try
             {
-                var threshold = DateTime.UtcNow - TimeSpan.FromMinutes(2);
+                var deletes = new List<string>();
+                var threshold = DateTime.UtcNow - TimeSpan.FromSeconds(90);
 
-                foreach (var kvp in _semaphoreLocks.ToArray())
+                foreach (var kvp in _semaphoreLocks)
                 {
                     if (kvp.Value.LastUsed < threshold && _semaphoreLocks.TryRemove(kvp.Key, out var removed))
                         removed.Dispose();

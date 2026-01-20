@@ -22,17 +22,16 @@ namespace Shared.Engine
                     {
                         var now = DateTime.UtcNow;
 
-                        foreach (string clientKey in _clients
-                            .Where(c => DateTime.UtcNow > c.Value.lifetime)
-                            .Select(c => c.Key)
-                            .ToArray())
+                        foreach (var client in _clients)
                         {
                             try
                             {
-                                if (_clients.TryRemove(clientKey, out var _c))
+                                if (DateTime.UtcNow > client.Value.lifetime && 
+                                    _clients.TryRemove(client.Key, out var _c))
                                 {
-                                    await Task.Delay(TimeSpan.FromSeconds(20));
-                                    _c.http.Dispose();
+                                    _= Task.Delay(TimeSpan.FromSeconds(20))
+                                        .ContinueWith(e => _c.http.Dispose())
+                                        .ConfigureAwait(false);
                                 }
                             }
                             catch { }

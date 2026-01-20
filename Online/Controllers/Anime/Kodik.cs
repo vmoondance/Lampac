@@ -26,40 +26,34 @@ namespace Online.Controllers
         #endregion
 
         #region HMAC
+        static readonly ConcurrentDictionary<string, byte[]> keyBytes = new ConcurrentDictionary<string, byte[]>();
+
         static string HMAC(string key, string message)
         {
-            var pool = ArrayPool<byte>.Shared;
-
-            int keyByteCount = Encoding.UTF8.GetByteCount(key);
-            byte[] keyBytes = pool.Rent(keyByteCount);
-
-            try
+            if (!keyBytes.TryGetValue(key, out byte[] arraykey))
             {
-                Encoding.UTF8.GetBytes(key, keyBytes);
-
-                Span<byte> msgBytes = stackalloc byte[Encoding.UTF8.GetByteCount(message)];
-                Span<byte> hash = stackalloc byte[32];
-                Span<char> hex = stackalloc char[64];
-
-                Encoding.UTF8.GetBytes(message, msgBytes);
-
-                using (var hmac = new HMACSHA256(keyBytes.AsSpan(0, keyByteCount).ToArray()))
-                    hmac.TryComputeHash(msgBytes, hash, out _);
-
-                const string hexChars = "0123456789abcdef";
-                for (int i = 0; i < 32; i++)
-                {
-                    byte b = hash[i];
-                    hex[i * 2] = hexChars[b >> 4];
-                    hex[i * 2 + 1] = hexChars[b & 0xF];
-                }
-
-                return new string(hex);
+                arraykey = Encoding.UTF8.GetBytes(key);
+                keyBytes.TryAdd(key, arraykey);
             }
-            finally
+
+            Span<byte> msgBytes = stackalloc byte[Encoding.UTF8.GetByteCount(message)];
+            Span<byte> hash = stackalloc byte[32];
+            Span<char> hex = stackalloc char[64];
+
+            Encoding.UTF8.GetBytes(message, msgBytes);
+
+            using (var hmac = new HMACSHA256(arraykey))
+                hmac.TryComputeHash(msgBytes, hash, out _);
+
+            const string hexChars = "0123456789abcdef";
+            for (int i = 0; i < 32; i++)
             {
-                pool.Return(keyBytes);
+                byte b = hash[i];
+                hex[i * 2] = hexChars[b >> 4];
+                hex[i * 2 + 1] = hexChars[b & 0xF];
             }
+
+            return new string(hex);
         }
         #endregion
 

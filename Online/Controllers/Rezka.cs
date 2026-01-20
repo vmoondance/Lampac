@@ -101,7 +101,8 @@ namespace Online.Controllers
 
             if (string.IsNullOrEmpty(href) && !string.IsNullOrEmpty(source) && !string.IsNullOrEmpty(id))
             {
-                if (source.ToLower() is "rezka" or "hdrezka")
+                if (source.Equals("rezka", StringComparison.OrdinalIgnoreCase) ||
+                    source.Equals("hdrezka", StringComparison.OrdinalIgnoreCase))
                     href = id;
             }
 

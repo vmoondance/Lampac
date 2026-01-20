@@ -170,7 +170,8 @@ namespace Online.Controllers
 
             if (string.IsNullOrEmpty(href) && !string.IsNullOrEmpty(source) && !string.IsNullOrEmpty(id))
             {
-                if (source.ToLower() is "rezka" or "hdrezka")
+                if (source.Equals("rezka", StringComparison.OrdinalIgnoreCase) ||
+                    source.Equals("hdrezka", StringComparison.OrdinalIgnoreCase))
                     href = id;
             }
 
@@ -190,7 +191,7 @@ namespace Online.Controllers
 
             if (string.IsNullOrEmpty(href))
             {
-                var search = await InvokeCacheResult<SearchModel>($"rhsprem:search:{title}:{original_title}:{clarification}:{year}", 40, async e =>
+                var search = await InvokeCacheResult<SearchModel>($"rhsprem:search:{onrezka.cookie}:{title}:{original_title}:{clarification}:{year}", 40, async e =>
                 {
                     var content = await oninvk.Search(title, original_title, clarification, year);
                     if (content == null || (content.IsEmpty && content.content != null))
@@ -230,7 +231,7 @@ namespace Online.Controllers
             }
             #endregion
 
-            var cache = await InvokeCacheResult($"rhsprem:{href}", 10, 
+            var cache = await InvokeCacheResult($"rhsprem:{onrezka.cookie}:{href}", 10, 
                 () => oninvk.Embed(href, search_uri)
             );
 
@@ -257,11 +258,11 @@ namespace Online.Controllers
 
             var oninvk = onrezka.invk;
 
-            var cache_root = await InvokeCacheResult($"rhsprem:view:serial:{id}:{t}", 20, 
+            var cache_root = await InvokeCacheResult($"rhsprem:view:serial:{onrezka.cookie}:{id}:{t}", 20, 
                 () => oninvk.SerialEmbed(id, t)
             );
 
-            var cache_content = await InvokeCacheResult($"rhsprem:{href}", 10, 
+            var cache_content = await InvokeCacheResult($"rhsprem:{onrezka.cookie}:{href}", 10, 
                 () => oninvk.Embed(href, null)
             );
 

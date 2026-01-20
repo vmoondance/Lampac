@@ -40,6 +40,16 @@ namespace Shared.Engine
 
         static readonly ThreadLocal<JsonSerializer> _serializerIgnoreDeserialize = new ThreadLocal<JsonSerializer>(() => JsonSerializer.Create(new JsonSerializerSettings { Error = (se, ev) => { ev.ErrorContext.Handled = true; } }));
 
+
+        public static string ErrorMsg => AppInit.conf.rch.enable ? "rhub не работает с данным балансером" : "Включите rch в init.conf";
+
+        public static EventHandler<(string connectionId, string rchId, string url, string data, Dictionary<string, string> headers, bool returnHeaders)> hub = null;
+
+        public static readonly ConcurrentDictionary<string, (string ip, string host, RchClientInfo info, NwsConnection connection)> clients = new();
+
+        public static readonly ConcurrentDictionary<string, (MemoryStream ms, TaskCompletionSource<string> tcs)> rchIds = new();
+
+
         async static void CheckConnection(object state)
         {
             if (clients.IsEmpty)
@@ -79,15 +89,6 @@ namespace Shared.Engine
                 Volatile.Write(ref _cronCheckConnectionWork, 0);
             }
         }
-
-
-        public static string ErrorMsg => AppInit.conf.rch.enable ? "rhub не работает с данным балансером" : "Включите rch в init.conf";
-
-        public static EventHandler<(string connectionId, string rchId, string url, string data, Dictionary<string, string> headers, bool returnHeaders)> hub = null;
-
-        public static readonly ConcurrentDictionary<string, (string ip, string host, RchClientInfo info, NwsConnection connection)> clients = new();
-
-        public static readonly ConcurrentDictionary<string, (MemoryStream ms, TaskCompletionSource<string> tcs)> rchIds = new();
 
 
         public static void Registry(string ip, string connectionId, string host = null, string json = null, NwsConnection connection = null)

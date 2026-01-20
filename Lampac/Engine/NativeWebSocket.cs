@@ -445,11 +445,11 @@ namespace Lampac.Engine
             if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(name))
                 return Task.CompletedTask;
 
-            var targets = event_clients.Where(i => i.Value == uid && (connectionId == null || i.Key != connectionId)).Select(i => i.Key).ToArray();
-            if (targets.Length == 0)
+            var targets = event_clients.Where(i => i.Value == uid && (connectionId == null || i.Key != connectionId)).Select(i => i.Key);
+            if (!targets.Any())
                 return Task.CompletedTask;
 
-            var tasks = new List<Task>(targets.Length);
+            var tasks = new List<Task>();
             foreach (string targetId in targets)
             {
                 if (_connections.TryGetValue(targetId, out var client))
@@ -519,19 +519,16 @@ namespace Lampac.Engine
                 var now = DateTime.UtcNow;
                 var cutoff = now.AddSeconds(-125); // ping каждые 40 секунд
 
-                foreach (string connectionId in _connections.Select(kv => kv.Key).ToArray())
+                foreach (var connection in _connections)
                 {
-                    if (_connections.TryGetValue(connectionId, out var connection))
-                    {
-                        if (cutoff >= connection.LastActivityUtc)
-                            connection.Cancel();
+                    if (cutoff >= connection.Value.LastActivityUtc)
+                        connection.Value.Cancel();
 
-                        int inactiveAfterMinutes = AppInit.conf.WebSocket.inactiveAfterMinutes;
-                        if (inactiveAfterMinutes > 0)
-                        {
-                            if (now.AddMinutes(-inactiveAfterMinutes) >= connection.LastSendActivityUtc)
-                                connection.Cancel();
-                        }
+                    int inactiveAfterMinutes = AppInit.conf.WebSocket.inactiveAfterMinutes;
+                    if (inactiveAfterMinutes > 0)
+                    {
+                        if (now.AddMinutes(-inactiveAfterMinutes) >= connection.Value.LastSendActivityUtc)
+                            connection.Value.Cancel();
                     }
                 }
             }
