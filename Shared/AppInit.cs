@@ -1069,7 +1069,7 @@ namespace Shared
         /// api.vokino.org
         /// api.vokino.pro
         /// </summary>
-        public VokinoSettings VoKino { get; set; } = new VokinoSettings("VoKino", "http://api.vokino.pro", streamproxy: false)
+        public VokinoSettings VoKino { get; set; } = new VokinoSettings("VoKino", "http://api.vokino.org", streamproxy: false)
         {
             rchstreamproxy = "web",
             rhub_safety = false

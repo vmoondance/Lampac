@@ -127,7 +127,7 @@ namespace Lampac.Engine.Middlewares
             return true;
         }
 
-        static readonly ThreadLocal<StringBuilder> sbQueryValue = new(() => new StringBuilder(PoolInvk.rentChunk));
+        static readonly ThreadLocal<StringBuilder> sbQueryValue = new(() => new StringBuilder(256));
 
         static string ValidQueryValue(string name, StringValues values)
         {
@@ -141,6 +141,8 @@ namespace Lampac.Engine.Middlewares
 
             if (value.IsEmpty)
                 return string.Empty;
+
+            bool _newQuery = false;
 
             var sb = sbQueryValue.Value;
             sb.Clear();
@@ -173,9 +175,14 @@ namespace Lampac.Engine.Middlewares
                         continue;
                     }
                 }
+
+                _newQuery = true;
             }
 
-            return sb.ToString();
+            if (_newQuery)
+                return sb.ToString();
+
+            return values[0];
         }
         #endregion
     }

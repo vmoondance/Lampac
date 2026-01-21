@@ -204,12 +204,6 @@ namespace Shared
                     return true;
             }
 
-            if (!init.enable || init.rip)
-            {
-                badInitMsg = OnError("disable", rcache: false, statusCode: 403);
-                return true;
-            }
-
             if (NoAccessGroup(init, out string error_msg))
             {
                 badInitMsg = OnError(error_msg, rcache: false, statusCode: 401);
@@ -224,6 +218,12 @@ namespace Shared
                     badInitMsg = overridehost;
                     return true;
                 }
+            }
+
+            if (!init.enable || init.rip)
+            {
+                badInitMsg = OnError("disable", rcache: false, statusCode: 403);
+                return true;
             }
 
             if (rch != null)
