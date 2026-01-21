@@ -29,7 +29,7 @@
 
         public static List<HeadersModel> Init(params (string name, string val)[] headers)
         {
-            var h = new List<HeadersModel>(headers.Count());
+            var h = new List<HeadersModel>();
 
             foreach (var i in headers)
             {
@@ -47,10 +47,10 @@
 
         public static List<HeadersModel> Init(IEnumerable<KeyValuePair<string, string>> headers)
         {
-            if (headers == null || headers.Count() == 0)
+            if (headers == null || !headers.Any())
                 return new List<HeadersModel>();
 
-            var h = new List<HeadersModel>(headers.Count());
+            var h = new List<HeadersModel>();
 
             foreach (var i in headers)
             {

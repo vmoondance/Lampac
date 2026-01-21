@@ -122,8 +122,16 @@ namespace Lampac.Engine.Middlewares
                             continue;
 
                         string cachefile = getFilePath(_c.Key, _c.Value.ex, _c.Value.contentType);
-                        File.Delete(cachefile);
-                        File.Delete($"{cachefile}.gz");
+
+                        if (File.Exists(cachefile))
+                        {
+                            try
+                            {
+                                File.Delete(cachefile);
+                                File.Delete($"{cachefile}.gz");
+                            }
+                            catch { }
+                        }
 
                         cacheFiles.TryRemove(_c.Key, out _);
                     }
@@ -194,7 +202,7 @@ namespace Lampac.Engine.Middlewares
                 {
                     for (int i = 0; i < values.Count; i++)
                     {
-                        var v = values[i].AsSpan();
+                        string v = values[i];
 
                         if (v.IndexOf("gzip", StringComparison.OrdinalIgnoreCase) >= 0 &&
                             v.IndexOf("gzip;q=0", StringComparison.OrdinalIgnoreCase) < 0)
@@ -252,31 +260,31 @@ namespace Lampac.Engine.Middlewares
         }
 
 
+        static readonly ThreadLocal<StringBuilder> sbQueryKeys = new(() => new StringBuilder(PoolInvk.rentChunk));
+
         static string getQueryKeys(HttpContext httpContext, string[] keys)
         {
             if (keys == null || keys.Length == 0)
                 return string.Empty;
 
-            var sb = new StringBuilder();
+            var sb = sbQueryKeys.Value;
+            sb.Clear();
 
             foreach (string key in keys)
             {
-                if (httpContext.Request.Query.TryGetValue(key, out StringValues value))
+                if (httpContext.Request.Query.TryGetValue(key, out StringValues value) && value.Count > 0)
                 {
                     sb.Append(key);
                     sb.Append(":");
-                    sb.Append(value.ToString());
+                    sb.Append(value[0]);
                     sb.Append(":");
                 }
             }
 
-            if (httpContext.Request.Query.TryGetValue("rjson", out StringValues rjson))
-            {
-                sb.Append("rjson:");
-                sb.Append(rjson.ToString());
-            }
+            if (httpContext.Request.Query.TryGetValue("rjson", out StringValues rjson) && rjson.Count > 0)
+                sb.Append($"rjson:{rjson[0]}");
 
-            return CrypTo.md5(sb.ToString());
+            return CrypTo.md5(sb);
         }
 
         static string getFilePath(string cachekey, DateTime ex, string contentType)

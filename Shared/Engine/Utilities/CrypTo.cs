@@ -6,6 +6,34 @@ namespace Shared.Engine
 {
     public class CrypTo
     {
+        public static unsafe string md5(StringBuilder text)
+        {
+            if (text == null || text.Length == 0)
+                return string.Empty;
+
+            char* nativeBuffer = (char*)NativeMemory.Alloc((nuint)(text.Length * sizeof(char)));
+            Span<char> buffer = new Span<char>(nativeBuffer, text.Length);
+
+            try
+            {
+                int offset = 0;
+                foreach (var chunk in text.GetChunks())
+                {
+                    if (chunk.IsEmpty)
+                        continue;
+
+                    chunk.Span.CopyTo(buffer.Slice(offset));
+                    offset += chunk.Length;
+                }
+
+                return md5(buffer);
+            }
+            finally
+            {
+                NativeMemory.Free(nativeBuffer);
+            }
+        }
+
         public static unsafe string md5(ReadOnlySpan<char> text)
         {
             if (text.IsEmpty)

@@ -92,6 +92,12 @@ namespace Lampac.Engine.Middlewares
                     continue;
                 }
 
+                if (path.StartsWith("/proxy/") || path.StartsWith("/proxyimg"))
+                {
+                    if (ch == ':' || ch == '+' || ch == '=')
+                        continue;
+                }
+
                 return false;
             }
 
@@ -146,6 +152,7 @@ namespace Lampac.Engine.Middlewares
                     ch == '-' || ch == '_' || ch == ' ' || // base
                     (ch >= '0' && ch <= '9') ||
                     ch == '@' || // email
+                    ch == '+' || // aes
                     char.IsLetter(ch) // ← любые буквы Unicode
                 )
                 {
