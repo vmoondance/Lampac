@@ -148,7 +148,7 @@ namespace Shared
         public List<HeadersModel> httpHeaders(string site, List<HeadersModel> _headers)
         {
             if (_headers == null || _headers.Count == 0)
-                return null;
+                return _headers;
 
             #region проверка на changeHeaders
             bool changeHeaders = false;

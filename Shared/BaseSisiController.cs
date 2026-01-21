@@ -433,7 +433,7 @@ namespace Shared
                 for (int i = 0; i < stream_links.recomends.Count; i++)
                 {
                     var pl = stream_links.recomends[i];
-                    result.recomends[i] = new OnResultPlaylistItem
+                    result.recomends[i] = new PlaylistItem
                     {
                         name = pl.name,
                         video = pl.video.StartsWith("http") ? pl.video : $"{host}/{pl.video}",
