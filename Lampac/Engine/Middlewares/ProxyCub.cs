@@ -76,8 +76,8 @@ namespace Lampac.Engine.Middlewares
             {
                 ctsHttp.CancelAfter(TimeSpan.FromSeconds(30));
 
-                var hybridCache = new HybridCache();
                 var requestInfo = httpContext.Features.Get<RequestModel>();
+                var hybridCache = IHybridCache.Get(requestInfo);
 
                 var init = AppInit.conf.cub;
                 string domain = init.domain;

@@ -34,14 +34,14 @@ namespace Shared
         protected ActionResult badInitMsg { get; set; }
 
         #region hybridCache
-        private HybridCache _hybridCache;
+        private IHybridCache _hybridCache;
 
-        protected HybridCache hybridCache
+        protected IHybridCache hybridCache
         {
             get
             {
                 if (_hybridCache == null)
-                    _hybridCache = new HybridCache(requestInfo);
+                    _hybridCache = IHybridCache.Get(requestInfo);
 
                 return _hybridCache;
             }

@@ -432,7 +432,7 @@ namespace Shared
 
         public HybridCacheConf cache = new HybridCacheConf() 
         {
-            type = "sql",  // mem|sql|hybrid
+            type = "sql",  // mem|sql|hybrid|fdb
             extend = -1,   // seconds (hybrid)
             reqIPs = 5
         };

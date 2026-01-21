@@ -102,8 +102,12 @@ namespace Lampac.Engine.Middlewares
                 }
                 catch
                 {
-                    File.Delete(inFile);
-                    File.Delete($"{inFile}.gz");
+                    try
+                    {
+                        File.Delete(inFile);
+                        File.Delete($"{inFile}.gz");
+                    }
+                    catch { }
                 }
             }
         }
