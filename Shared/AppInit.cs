@@ -446,6 +446,7 @@ namespace Shared
             limit_map = new Dictionary<string, WafLimitMap>()
             {
                 ["^/(tmdb|cub|dlna|transcoding|ts|proxy)"] = new WafLimitMap() { limit = 50, second = 1 },
+                ["^/nexthub"] = new WafLimitMap() { limit = 20, second = 1 },
                 [".*"] = new WafLimitMap() { limit = 10, second = 1 }
             }
         };

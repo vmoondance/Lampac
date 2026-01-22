@@ -92,7 +92,9 @@ namespace Lampac.Engine.Middlewares
                     continue;
                 }
 
-                if (path.StartsWith("/proxy/") || path.StartsWith("/proxyimg"))
+                if (path.StartsWith("/proxy/") ||
+                    path.StartsWith("/proxyimg") ||
+                    path.StartsWith("/lite/videoseed/video/"))
                 {
                     if (ch == ':' || ch == '+' || ch == '=')
                         continue;

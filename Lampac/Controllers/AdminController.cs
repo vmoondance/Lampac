@@ -19,6 +19,7 @@ namespace Lampac.Controllers
     {
         #region admin / auth
         [HttpGet]
+        [HttpPost]
         [Route("/admin")]
         [Route("/admin/auth")]
         public ActionResult Authorization([FromForm]string parol)
