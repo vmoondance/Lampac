@@ -156,7 +156,12 @@ namespace Catalog
                     }
                     else
                     {
-                        value = node.GetAttributeValue(nd.attribute, null);
+                        if ("innerhtml".Equals(nd.attribute, StringComparison.OrdinalIgnoreCase))
+                            value = node.InnerHtml;
+                        else if ("outerhtml".Equals(nd.attribute, StringComparison.OrdinalIgnoreCase))
+                            value = node.OuterHtml;
+                        else
+                            value = node.GetAttributeValue(nd.attribute, null);
                     }
                 }
                 else
@@ -178,7 +183,19 @@ namespace Catalog
                         }
                         else
                         {
-                            value = (!string.IsNullOrEmpty(nd.attribute) ? inNode.GetAttributeValue(nd.attribute, null) : inNode.InnerText)?.Trim();
+                            if (!string.IsNullOrEmpty(nd.attribute))
+                            {
+                                if ("innerhtml".Equals(nd.attribute, StringComparison.OrdinalIgnoreCase))
+                                    value = inNode.InnerHtml;
+                                else if ("outerhtml".Equals(nd.attribute, StringComparison.OrdinalIgnoreCase))
+                                    value = inNode.OuterHtml;
+                                else
+                                    value = inNode.GetAttributeValue(nd.attribute, null)?.Trim();
+                            }
+                            else
+                            {
+                                value = inNode.InnerText?.Trim();
+                            }
                         }
                     }
                 }
@@ -326,6 +343,10 @@ namespace Catalog
                             array.Add(new JObject() { ["name"] = clearText(item.ToString()) });
 
                         jo[arg.name_arg] = array;
+                    }
+                    else if (val is JToken token && token.Type == JTokenType.Array)
+                    {
+                        jo[arg.name_arg] = token;
                     }
                 }
                 else if (val is string && (arg.name_arg is "origin_country" or "languages"))
