@@ -250,7 +250,7 @@ namespace Shared.Engine.Online
                             }
 
                             var root = JsonSerializer.Deserialize<Models.Online.Tortuga.Voice[]>(file);
-                            if (root == null || root.Length == 0)
+                            if (root != null && root.Length > 0)
                                 result.serial = root;
                         }
                         catch { }
@@ -401,32 +401,29 @@ namespace Shared.Engine.Online
                     }
                     else
                     {
+                        string sArhc = s.ToString();
+                        var episodes = result.serial.First(i => i.season == sArhc).folder;
+
                         #region Перевод
                         var vtpl = new VoiceTpl();
                         var hashVoice = new HashSet<string>(20);
 
-                        foreach (var season in result.serial)
+                        foreach (var episode in episodes)
                         {
-                            foreach (var episode in season.folder)
+                            foreach (var voice in episode.folder)
                             {
-                                foreach (var voice in episode.folder)
-                                {
-                                    if (hashVoice.Contains(voice.title))
-                                        continue;
-                                    hashVoice.Add(voice.title);
+                                if (!hashVoice.Add(voice.title))
+                                    continue;
 
-                                    if (string.IsNullOrEmpty(t))
-                                        t = voice.title;
+                                if (string.IsNullOrEmpty(t))
+                                    t = voice.title;
 
-                                    string link = host + $"lite/kinoukr?rjson={rjson}&clarification={clarification}&title={enc_title}&original_title={enc_original_title}&year={year}&href={enc_href}&s={s}&t={voice.title}";
-                                    vtpl.Append(voice.title, t == voice.title, link);
-                                }
+                                string link = host + $"lite/kinoukr?rjson={rjson}&clarification={clarification}&title={enc_title}&original_title={enc_original_title}&year={year}&href={enc_href}&s={s}&t={voice.title}";
+                                vtpl.Append(voice.title, t == voice.title, link);
                             }
                         }
                         #endregion
 
-                        string sArhc = s.ToString();
-                        var episodes = result.serial.First(i => i.season == sArhc).folder;
                         var etpl = new EpisodeTpl(vtpl, episodes.Length);
 
                         foreach (var episode in episodes)
