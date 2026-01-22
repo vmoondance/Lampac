@@ -515,10 +515,6 @@ namespace Lampac.Engine.Middlewares
                             else
                                 res.JpegsaveStream(outArray);
 
-                            // drop rss
-                            image.Invalidate();
-                            res.Invalidate();
-
                             if (outArray.Length > 1000)
                                 return true;
                         }
@@ -611,7 +607,7 @@ namespace Lampac.Engine.Middlewares
                 shm = Directory.Exists("/dev/shm");
 
             if (shm == true)
-                return $"/dev/shm/{CrypTo.md5(DateTime.Now.ToBinary().ToString())}";
+                return $"/dev/shm/{CrypTo.md5(DateTime.Now.ToFileTimeUtc().ToString())}";
 
             return Path.GetTempFileName();
         }

@@ -365,7 +365,9 @@ namespace Lampac
                     "30078b973188c696273e10d6ef0ebbb2",
                     "92f5e2e03d2cc2697f2ee00becdb4696",
                     "b565c7e163485b8f8cc258b95f2891b6",
-                    "ec6659f1f91f1f6ec0c734ff2111c7d7"
+                    "ec6659f1f91f1f6ec0c734ff2111c7d7",
+                    "43c8f2a9fe75a3ce9c109e67bc552ace",
+                    "1ba06699c494190bce44f6786a24b96a"
                 };
 
                 try

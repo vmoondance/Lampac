@@ -112,6 +112,9 @@ namespace Online.Controllers
             if (string.IsNullOrEmpty(iframe))
                 return OnError();
 
+            iframe = Regex.Replace(iframe, "token=[a-z0-9]{32}", "token=00000000000000000000000000000000");
+            iframe = Regex.Replace(iframe, "tv-[0-9]", "tv-2");
+
             return await InvkSemaphore($"videoseed:video:{iframe}:{proxyManager?.CurrentProxyIp}", async key =>
             {
                 if (!hybridCache.TryGetValue(key, out string location))

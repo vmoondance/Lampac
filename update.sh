@@ -23,7 +23,7 @@ if [ -n "$VERSION" ]; then
 fi
 
 ver=$(cat data/vers.txt)
-gitver=$(curl --connect-timeout 10 -m 20 -k -s https://api.github.com/repos/immisterio/Lampac/releases/latest | grep tag_name | sed s/[^0-9]//g)
+gitver=$(curl --connect-timeout 10 -k -s https://api.github.com/repos/immisterio/Lampac/releases/latest | grep tag_name | sed s/[^0-9]//g)
 if [ $gitver -gt $ver ]; then
     echo "update lampac to version $gitver"
     rm -f update.zip
@@ -42,7 +42,7 @@ if [ $gitver -gt $ver ]; then
     systemctl start lampac
 else
     check_ping() {
-        response=$(curl --connect-timeout 5 -m 10 -k -s "$1/ping")
+        response=$(curl --connect-timeout 4 -k -s "$1/ping")
         if [[ "$response" == *"pong"* ]]; then
             return 0
         else
@@ -50,7 +50,9 @@ else
         fi
     }
 
-    if check_ping "http://noah.lampac.sh"; then
+    if check_ping "http://vultr.lampac.sh"; then
+        BASE_URL="http://vultr.lampac.sh"
+    elif check_ping "http://noah.lampac.sh"; then
         BASE_URL="http://noah.lampac.sh"
     elif check_ping "https://lampac.sh"; then
         BASE_URL="https://lampac.sh"
