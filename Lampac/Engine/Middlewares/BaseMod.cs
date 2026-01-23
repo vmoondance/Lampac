@@ -148,7 +148,7 @@ namespace Lampac.Engine.Middlewares
             {
                 if (
                     ch == '/' || ch == ':' || ch == '?' || ch == '&' || ch == '=' || ch == '.' || // ссылки
-                    ch == '-' || ch == '_' || ch == ' ' || // base
+                    ch == '-' || ch == '_' || ch == ' ' || ch == ',' ||// base
                     (ch >= '0' && ch <= '9') ||
                     ch == '@' || // email
                     ch == '+' || // aes
@@ -159,7 +159,7 @@ namespace Lampac.Engine.Middlewares
                     continue;
                 }
 
-                if (name is "title" or "original_title")
+                if (name is "title" or "original_title" or "t")
                 {
                     if (
                         char.IsDigit(ch) || // ← символ цифрой Unicode

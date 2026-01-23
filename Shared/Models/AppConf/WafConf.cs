@@ -6,6 +6,8 @@ namespace Shared.Models.AppConf
     {
         public bool enable { get; set; }
 
+        public bool bypassLocalIP { get; set; }
+
         public bool allowExternalIpAccess { get; set; }
 
         public bool bruteForceProtection { get; set; }
@@ -27,6 +29,10 @@ namespace Shared.Models.AppConf
         public List<string> countryDeny { get; set; }
 
         public List<string> countryAllow { get; set; }
+
+        public List<long> asnDeny { get; set; }
+
+        public List<long> asnAllow { get; set; }
 
         /// <summary>
         /// header_key: regex

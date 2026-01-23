@@ -6,6 +6,7 @@ using Shared.Models;
 using Shared.Models.AppConf;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -34,6 +35,9 @@ namespace Lampac.Engine.Middlewares
                 return _next(httpContext);
 
             if (waf.whiteIps != null && waf.whiteIps.Contains(requestInfo.IP))
+                return _next(httpContext);
+
+            if (waf.bypassLocalIP && requestInfo.IsLocalIp)
                 return _next(httpContext);
 
             #region BruteForce
@@ -70,6 +74,27 @@ namespace Lampac.Engine.Middlewares
             {
                 // точно знаем страну и она есть в списке запрещенных
                 if (!string.IsNullOrEmpty(requestInfo.Country) && waf.countryDeny.Contains(requestInfo.Country))
+                {
+                    httpContext.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                }
+            }
+            #endregion
+
+            #region ASN
+            if (waf.asnAllow != null)
+            {
+                // если мы не знаем asn или точно знаем, что он не в списке разрешенных
+                if (requestInfo.ASN == -1 || !waf.asnAllow.Contains(requestInfo.ASN))
+                {
+                    httpContext.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                }
+            }
+
+            if (waf.asnDeny != null)
+            {
+                if (waf.asnDeny.Contains(requestInfo.ASN))
                 {
                     httpContext.Response.StatusCode = 403;
                     return Task.CompletedTask;
