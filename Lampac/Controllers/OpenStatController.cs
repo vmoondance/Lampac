@@ -122,7 +122,7 @@ namespace Lampac.Controllers
 
             int receive = 0, send = 0;
 
-            if (memoryCache.TryGetValue($"stats:nws:{now.Hour}:{now.Minute}", out CounterNws _c))
+            if (memoryCache.TryGetValue("stats:nws", out CounterNws _c))
             {
                 receive = _c.receive;
                 send = _c.send;

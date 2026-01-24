@@ -133,8 +133,7 @@ namespace Lampac.Engine
                     #region stats
                     if (AppInit.conf.openstat.enable && memoryCache != null)
                     {
-                        var now = DateTime.UtcNow;
-                        var counter = memoryCache.GetOrCreate($"stats:nws:{now.Hour}:{now.Minute}", entry =>
+                        var counter = memoryCache.GetOrCreate("stats:nws", entry =>
                         {
                             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                             return new CounterNws();
@@ -383,8 +382,7 @@ namespace Lampac.Engine
                 #region stats
                 if (AppInit.conf.openstat.enable && memoryCache != null)
                 {
-                    var now = DateTime.UtcNow;
-                    var counter = memoryCache.GetOrCreate($"stats:nws:{now.Hour}:{now.Minute}", entry =>
+                    var counter = memoryCache.GetOrCreate("stats:nws", entry =>
                     {
                         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
                         return new CounterNws();

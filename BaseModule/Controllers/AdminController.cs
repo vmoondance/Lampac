@@ -525,7 +525,7 @@ namespace Lampac.Controllers
 </body>
 </html>";
 
-                    return HttpContext.Response.WriteAsync(htmlSuccesds).ContinueWith(t => Program.Reload());
+                    return HttpContext.Response.WriteAsync(htmlSuccesds).ContinueWith(t => Shared.Startup.appReload.Reload());
                     #endregion
                 }
             }

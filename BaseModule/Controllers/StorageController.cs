@@ -1,4 +1,4 @@
-﻿using Lampac.Engine;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -8,8 +8,10 @@ using Shared.Engine;
 using Shared.Engine.Utilities;
 using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using IO = System.IO;
 
 namespace Lampac.Controllers
@@ -23,6 +25,55 @@ namespace Lampac.Controllers
             Directory.CreateDirectory("database/storage/temp");
         }
         #endregion
+
+        #region backup.js
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("backup.js")]
+        [Route("backup/js/{token}")]
+        public ActionResult Backup(string token)
+        {
+            if (!AppInit.conf.storage.enable)
+                return Content(string.Empty, "application/javascript; charset=utf-8");
+
+            var sb = new StringBuilder(FileCache.ReadAllText("plugins/backup.js"));
+
+            sb.Replace("{localhost}", host)
+              .Replace("{token}", HttpUtility.UrlEncode(token));
+
+            return Content(sb.ToString(), "application/javascript; charset=utf-8");
+        }
+        #endregion
+
+        #region sync.js
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("sync.js")]
+        [Route("sync/js/{token}")]
+        public ActionResult SyncJS(string token, bool lite)
+        {
+            if (!AppInit.conf.storage.enable)
+                return Content(string.Empty, "application/javascript; charset=utf-8");
+
+            StringBuilder sb;
+
+            if (lite || AppInit.conf.sync_user.version == 1)
+            {
+                sb = new StringBuilder(FileCache.ReadAllText($"plugins/{(lite ? "sync_lite" : "sync")}.js"));
+            }
+            else
+            {
+                sb = new StringBuilder(FileCache.ReadAllText("plugins/sync_v2/sync.js"));
+            }
+
+            sb.Replace("{sync-invc}", FileCache.ReadAllText("plugins/sync-invc.js"))
+              .Replace("{localhost}", host)
+              .Replace("{token}", HttpUtility.UrlEncode(token));
+
+            return Content(sb.ToString(), "application/javascript; charset=utf-8");
+        }
+        #endregion
+
 
         #region Get
         [HttpGet]
@@ -134,15 +185,15 @@ namespace Lampac.Controllers
                 try
                 {
                     var json = JsonConvert.DeserializeObject<JObject>(CrypTo.DecodeBase64(events));
-                    _ = soks.SendEvents(json.Value<string>("connectionId"), requestInfo.user_uid, json.Value<string>("name"), json.Value<string>("data")).ConfigureAwait(false);
-                    _ = NativeWebSocket.SendEvents(json.Value<string>("connectionId"), requestInfo.user_uid, json.Value<string>("name"), json.Value<string>("data")).ConfigureAwait(false);
+                    _ = Shared.Startup.WS.EventsAsync(json.Value<string>("connectionId"), requestInfo.user_uid, json.Value<string>("name"), json.Value<string>("data")).ConfigureAwait(false);
+                    _ = Shared.Startup.Nws.EventsAsync(json.Value<string>("connectionId"), requestInfo.user_uid, json.Value<string>("name"), json.Value<string>("data")).ConfigureAwait(false);
                 }
                 catch { }
             }
             else
             {
                 string edata = JsonConvertPool.SerializeObject(new { path, pathfile });
-                _ = NativeWebSocket.SendEvents(connectionId, requestInfo.user_uid, "storage", edata).ConfigureAwait(false);
+                _ = Shared.Startup.Nws.EventsAsync(connectionId, requestInfo.user_uid, "storage", edata).ConfigureAwait(false);
             }
             #endregion
 

@@ -381,7 +381,7 @@ namespace Shared
             ws = true,
             kurwaCron = true,
             allowExternalIpAccessToLocalRequest = false,
-            DisableControllers = new BaseModuleDisableControllers(),
+            EnableControllers = ["Admin", "Bookmark", "Chromium", "Cmd", "PlayerInner", "Corseu", "Media", "ErrorDoc", "Cub", "LampaWeb", "RchApi", "Storage", "SyncApi", "Timecode", "Tmdb", "WebLog"],
             Middlewares = new BaseModuleMiddlewares() 
             {
                 proxy = true,

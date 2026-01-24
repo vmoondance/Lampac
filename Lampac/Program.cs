@@ -2,7 +2,9 @@ using Lampac.Engine;
 using Lampac.Engine.CRON;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +31,9 @@ namespace Lampac
     public class Program
     {
         #region static
-        public static bool _reload = true;
+        public static AppReload appReload { get; private set; }
+
+        public static List<PortableExecutableReference> assemblieReferences { get; private set; }
 
         static IHost _host;
 
@@ -68,7 +72,6 @@ namespace Lampac
                 }
             }
 
-
             AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
             {
                 foreach (string name in new string[] { $"ru/{assemblyName.Name}", assemblyName.Name })
@@ -88,6 +91,16 @@ namespace Lampac
         #region Run
         static void Run(string[] args)
         {
+            #region assemblieReferences
+            var dependencyContext = DependencyContext.Default;
+            var assemblies = dependencyContext.RuntimeLibraries
+                .SelectMany(library => library.GetDefaultAssemblyNames(dependencyContext))
+                .Select(Assembly.Load)
+                .ToList();
+
+            assemblieReferences = assemblies.Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
+            #endregion
+
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -398,27 +411,17 @@ namespace Lampac
                 TrackersCron.Run();
 
             LampaCron.Run();
+            appReload = new AppReload(_host);
 
             _usersTimer = new Timer(UpdateUsersDb, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
             _kitTimer = new Timer(UpdateKitDb, null, TimeSpan.Zero, TimeSpan.FromSeconds(Math.Max(5, AppInit.conf.kit.cacheToSeconds)));
 
-            while (_reload)
+            while (AppReload._reload)
             {
                 _host = CreateHostBuilder(args).Build();
-                _reload = false;
+                AppReload._reload = false;
                 _host.Run();
             }
-        }
-        #endregion
-
-
-        #region Reload
-        public static void Reload()
-        {
-            _reload = true;
-            _host.StopAsync();
-
-            AppInit.LoadModules();
         }
         #endregion
 

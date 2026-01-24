@@ -14,7 +14,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Newtonsoft.Json;
@@ -226,8 +225,9 @@ namespace Lampac
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
             });
 
-            #region module/references
+            #region module references
             string referencesPath = Path.Combine(Environment.CurrentDirectory, "module", "references");
+
             if (Directory.Exists(referencesPath))
             {
                 var current = AppDomain.CurrentDomain.GetAssemblies();
@@ -241,6 +241,8 @@ namespace Lampac
 
                         Assembly loadedAssembly = Assembly.LoadFrom(dllFile);
                         mvcBuilder.AddApplicationPart(loadedAssembly);
+                        Program.assemblieReferences.Add(MetadataReference.CreateFromFile(loadedAssembly.Location));
+
                         Console.WriteLine($"load reference: {Path.GetFileName(dllFile)}");
                     }
                     catch (Exception ex)
@@ -252,6 +254,7 @@ namespace Lampac
             #endregion
 
             ModuleRepository.Configuration(mvcBuilder);
+            BaseModControllers(mvcBuilder);
 
             #region compilation modules
             if (AppInit.modules != null)
@@ -285,8 +288,6 @@ namespace Lampac
                     return;
 
                 #region CompilationMod
-                List<PortableExecutableReference> references = null;
-
                 void CompilationMod(RootModule mod)
                 {
                     if (!mod.enable || AppInit.modules.FirstOrDefault(i => i.dll == mod.dll) != null)
@@ -324,17 +325,6 @@ namespace Lampac
                             syntaxTree.Add(CSharpSyntaxTree.ParseText(File.ReadAllText(file)));
                         }
 
-                        if (references == null)
-                        {
-                            var dependencyContext = DependencyContext.Default;
-                            var assemblies = dependencyContext.RuntimeLibraries
-                                .SelectMany(library => library.GetDefaultAssemblyNames(dependencyContext))
-                                .Select(Assembly.Load)
-                                .ToList();
-
-                            references = assemblies.Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
-                        }
-
                         if (mod.references != null)
                         {
                             foreach (string refns in mod.references)
@@ -343,15 +333,15 @@ namespace Lampac
                                 if (!File.Exists(dlrns))
                                     dlrns = Path.Combine(Environment.CurrentDirectory, "module", mod.dll, refns);
 
-                                if (File.Exists(dlrns) && references.FirstOrDefault(a => Path.GetFileName(a.FilePath) == refns) == null)
+                                if (File.Exists(dlrns) && Program.assemblieReferences.FirstOrDefault(a => Path.GetFileName(a.FilePath) == refns) == null)
                                 {
                                     var assembly = Assembly.LoadFrom(dlrns);
-                                    references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                                    Program.assemblieReferences.Add(MetadataReference.CreateFromFile(assembly.Location));
                                 }
                             }
                         }
 
-                        CSharpCompilation compilation = CSharpCompilation.Create(Path.GetFileName(mod.dll), syntaxTree, references: references, options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                        CSharpCompilation compilation = CSharpCompilation.Create(Path.GetFileName(mod.dll), syntaxTree, references: Program.assemblieReferences, options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
                         using (var ms = new MemoryStream())
                         {
@@ -404,8 +394,8 @@ namespace Lampac
                     }
                 }
 
-                if (references != null)
-                    CSharpEval.appReferences = references;
+                if (Program.assemblieReferences != null)
+                    CSharpEval.appReferences = Program.assemblieReferences;
             }
 
             if (AppInit.modules != null)
@@ -439,7 +429,7 @@ namespace Lampac
                 SyncUserContext.Factory = app.ApplicationServices.GetService<IDbContextFactory<SyncUserContext>>();
             #endregion
 
-            Shared.Startup.Configure(app, memory);
+            Shared.Startup.Configure(Program.appReload, app, memory, new NativeWebSocket(), new soks());
             HybridCache.Configure(memory);
             HybridFileCache.Configure(memory);
             ProxyManager.Configure(memory);
@@ -623,7 +613,7 @@ namespace Lampac
         #region OnShutdown
         void OnShutdown()
         {
-            if (Program._reload)
+            if (AppReload._reload)
                 return;
 
             IsShutdown = true;
@@ -635,6 +625,49 @@ namespace Lampac
             soks.FullDispose();
 
             DisposeModule(null);
+        }
+        #endregion
+
+        #region BaseModControllers
+        public void BaseModControllers(IMvcBuilder mvcBuilder)
+        {
+            var syntaxTree = new List<SyntaxTree>();
+
+            string patchcontrol = Path.Combine("basemod", "Controllers");
+            if (!Directory.Exists(patchcontrol))
+                patchcontrol = "../../../../../BaseModule/Controllers";
+
+            foreach (string file in Directory.GetFiles(patchcontrol, "*.cs", SearchOption.AllDirectories))
+            {
+                string name = Path.GetFileName(file).Replace("Controller.cs", "");
+
+                if (AppInit.conf.BaseModule.EnableControllers.Contains(name, StringComparer.OrdinalIgnoreCase))
+                    syntaxTree.Add(CSharpSyntaxTree.ParseText(File.ReadAllText(file)));
+            }
+
+            CSharpCompilation compilation = CSharpCompilation.Create("basemod", syntaxTree, references: Program.assemblieReferences, options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            using (var ms = new MemoryStream())
+            {
+                var result = compilation.Emit(ms);
+
+                if (result.Success)
+                {
+                    ms.Seek(0, SeekOrigin.Begin);
+                    var assembly = Assembly.Load(ms.ToArray());
+                    mvcBuilder.AddApplicationPart(assembly);
+                }
+                else
+                {
+                    Console.WriteLine($"\ncompilation error: basemod");
+                    foreach (var diagnostic in result.Diagnostics)
+                    {
+                        if (diagnostic.Severity == DiagnosticSeverity.Error)
+                            Console.WriteLine(diagnostic);
+                    }
+                    Console.WriteLine();
+                }
+            }
         }
         #endregion
 

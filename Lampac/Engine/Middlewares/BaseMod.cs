@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
-using Shared;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,27 +30,6 @@ namespace Lampac.Engine.Middlewares
                 return context.Response.WriteAsync("400 Bad Request", context.RequestAborted);
             }
 
-            var disble = AppInit.conf.BaseModule.DisableControllers;
-
-            if (disble.admin && context.Request.Path.Value.StartsWith("/admin"))
-                return Task.CompletedTask;
-
-            if (disble.bookmark && context.Request.Path.Value.StartsWith("/bookmark"))
-                return Task.CompletedTask;
-
-            if (disble.storage && context.Request.Path.Value.StartsWith("/storage"))
-                return Task.CompletedTask;
-
-            if (disble.timecode && context.Request.Path.Value.StartsWith("/timecode"))
-                return Task.CompletedTask;
-
-            if (disble.corseu && context.Request.Path.Value.StartsWith("/corseu"))
-                return Task.CompletedTask;
-
-            if (disble.media && context.Request.Path.Value.StartsWith("/media"))
-                return Task.CompletedTask;
-
-            #region valid query
             var builder = new QueryBuilder();
             var dict = new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase);
             var sbQuery = new StringBuilder(32);
@@ -69,7 +47,6 @@ namespace Lampac.Engine.Middlewares
 
             context.Request.QueryString = builder.ToQueryString();
             context.Request.Query = new QueryCollection(dict);
-            #endregion
 
             return _next(context);
         }

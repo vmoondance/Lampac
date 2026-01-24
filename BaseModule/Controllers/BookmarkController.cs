@@ -1,4 +1,3 @@
-using Lampac.Engine;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -267,7 +266,7 @@ namespace Lampac.Controllers
 
                 if (IsDbInitialization)
                 {
-                    _ = NativeWebSocket.SendEvents(connectionId, requestInfo.user_uid, "bookmark", JsonConvertPool.SerializeObject(new
+                    _ = Shared.Startup.Nws.EventsAsync(connectionId, requestInfo.user_uid, "bookmark", JsonConvertPool.SerializeObject(new
                     {
                         type = "set",
                         data = token,
@@ -336,7 +335,7 @@ namespace Lampac.Controllers
                                 data = readBody.token
                             });
 
-                            _ = NativeWebSocket.SendEvents(connectionId, requestInfo.user_uid, "bookmark", edata).ConfigureAwait(false);
+                            _ = Shared.Startup.Nws.EventsAsync(connectionId, requestInfo.user_uid, "bookmark", edata).ConfigureAwait(false);
                         }
                     }
                 }
@@ -410,7 +409,7 @@ namespace Lampac.Controllers
                                 data = readBody.token
                             });
 
-                            _ = NativeWebSocket.SendEvents(connectionId, requestInfo.user_uid, "bookmark", edata).ConfigureAwait(false);
+                            _ = Shared.Startup.Nws.EventsAsync(connectionId, requestInfo.user_uid, "bookmark", edata).ConfigureAwait(false);
                         }
                     }
                 }

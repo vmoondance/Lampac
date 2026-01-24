@@ -16,7 +16,7 @@ namespace Shared.Models.AppConf
 
         public BaseModuleSql Sql { get; set; }
 
-        public BaseModuleDisableControllers DisableControllers { get; set; }
+        public string[] EnableControllers { get; set; }
     }
 
 
@@ -105,21 +105,5 @@ namespace Shared.Models.AppConf
         public bool sisi { get; set; }
 
         public bool syncUser { get; set; }
-    }
-
-
-    public class BaseModuleDisableControllers
-    {
-        public bool admin { get; set; }
-
-        public bool bookmark { get; set; }
-
-        public bool storage { get; set; }
-
-        public bool timecode { get; set; }
-
-        public bool corseu { get; set; }
-
-        public bool media { get; set; }
     }
 }
