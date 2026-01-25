@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,8 +36,12 @@ namespace Lampac.Engine.Middlewares
             {
                 if (Regex.IsMatch(context.Request.Path.Value, "^/(ffprobe|transcoding|dlna|admin)", RegexOptions.IgnoreCase))
                 {
-                    context.Response.StatusCode = 400;
-                    return context.Response.WriteAsync("Please update dotnet\nhttps://github.com/dotnet/core/blob/main/release-notes/9.0/9.0.12/9.0.113.md", context.RequestAborted);
+                    string ip = context.Connection.RemoteIpAddress.ToString();
+                    if (!Shared.Engine.Utilities.IPNetwork.IsLocalIp(ip))
+                    {
+                        context.Response.StatusCode = 400;
+                        return context.Response.WriteAsync("Please update dotnet\nhttps://github.com/dotnet/core/blob/main/release-notes/9.0/9.0.12/9.0.113.md", context.RequestAborted);
+                    }
                 }
             }
 
