@@ -94,7 +94,7 @@ namespace Lampac.Engine.Middlewares
                 string href = servPath + httpContext.Request.QueryString.Value;
 
                 #region Проверки
-                if (servPath.Contains("image.tmdb.org"))
+                if (servPath.Contains("image.tmdb.org", StringComparison.OrdinalIgnoreCase))
                 {
                     httpContext.Response.Redirect($"/tmdb/img/{Regex.Replace(href.Replace("://", ":/_/").Replace("//", "/").Replace(":/_/", "://"), "^https?://[^/]+/", "")}");
                     return;
@@ -129,7 +129,7 @@ namespace Lampac.Engine.Middlewares
                 int width = 0;
                 int height = 0;
 
-                if (httpContext.Request.Path.Value.StartsWith("/proxyimg:"))
+                if (httpContext.Request.Path.Value.StartsWith("/proxyimg:", StringComparison.OrdinalIgnoreCase))
                 {
                     if (!cacheimg)
                         cacheimg = init.cache_rsize;
@@ -155,9 +155,12 @@ namespace Lampac.Engine.Middlewares
                     url_reserve = urls[1];
                 }
 
-                string contentType = href.Contains(".png") ? "image/png" : href.Contains(".webp") ? "image/webp" : "image/jpeg";
+                string contentType = href.Contains(".png", StringComparison.OrdinalIgnoreCase) 
+                    ? "image/png" 
+                    : href.Contains(".webp", StringComparison.OrdinalIgnoreCase) ? "image/webp" : "image/jpeg";
+
                 if (width > 0 || height > 0)
-                    contentType = href.Contains(".png") ? "image/png" : "image/jpeg";
+                    contentType = href.Contains(".png", StringComparison.OrdinalIgnoreCase) ? "image/png" : "image/jpeg";
 
                 #region cacheFiles
                 if (cacheimg)
@@ -510,7 +513,7 @@ namespace Lampac.Engine.Middlewares
                     {
                         using (var res = image.ThumbnailImage(width == 0 ? image.Width : width, height == 0 ? image.Height : height, crop: NetVips.Enums.Interesting.None))
                         {
-                            if (href.Contains(".png"))
+                            if (href.Contains(".png", StringComparison.OrdinalIgnoreCase))
                                 res.PngsaveStream(outArray);
                             else
                                 res.JpegsaveStream(outArray);

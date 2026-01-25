@@ -1,5 +1,6 @@
 using Lampac.Engine;
 using Lampac.Engine.CRON;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis;
@@ -21,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,6 +33,10 @@ namespace Lampac
     public class Program
     {
         #region static
+        public static string Runtime { get; private set; }
+
+        public static bool RuntimeCve2025_55315 { get; private set; }
+
         public static AppReload appReload { get; private set; }
 
         public static List<PortableExecutableReference> assemblieReferences { get; private set; }
@@ -99,6 +105,16 @@ namespace Lampac
                 .ToList();
 
             assemblieReferences = assemblies.Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
+            #endregion
+
+            #region dotnet runtime
+            var asm = typeof(WebApplication).Assembly;
+            string info = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            if (!string.IsNullOrWhiteSpace(info))
+            {
+                Runtime = info.Split('+', '-', ' ')[0];
+                RuntimeCve2025_55315 = Runtime is "9.0.1" or "9.0.2" or "9.0.3" or "9.0.4" or "9.0.5" or "9.0.6" or "9.0.7" or "9.0.8" or "9.0.9";
+            }
             #endregion
 
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
