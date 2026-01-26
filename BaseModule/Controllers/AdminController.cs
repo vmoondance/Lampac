@@ -363,10 +363,13 @@ namespace Lampac.Controllers
         [Route("/admin/manifest/install")]
         public Task ManifestInstallHtml(string online, string sisi, string jac, string dlna, string tracks, string ts, string catalog, string merch, string eng)
         {
-            if (IO.File.Exists("module/manifest.json") && !TryAuthorizeAdmin(null, out ActionResult badresult))
+            if (IO.File.Exists("module/manifest.json"))
             {
-                HttpContext.Response.Redirect("/admin/auth");
-                return Task.CompletedTask;
+                if (!TryAuthorizeAdmin(null, out ActionResult badresult))
+                {
+                    HttpContext.Response.Redirect("/admin/auth");
+                    return Task.CompletedTask;
+                }
             }
 
             HttpContext.Response.ContentType = "text/html; charset=utf-8";
