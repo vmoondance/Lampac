@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Hosting;
 using Shared.Models;
 
 namespace Shared
@@ -36,20 +35,14 @@ namespace Shared
 
     public class AppReload
     {
-        IHost _host;
-
-        public AppReload(IHost _host)
-        {
-            this._host = _host;
-        }
-
-        public static bool _reload { get; set; } = true;
+        public Action InkvReload { get; set; }
 
         public void Reload()
         {
-            _reload = true;
-            _host.StopAsync();
-            AppInit.LoadModules();
+            if (InkvReload == null)
+                return;
+
+            InkvReload();
         }
     }
 }

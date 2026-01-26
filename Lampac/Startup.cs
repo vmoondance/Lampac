@@ -615,7 +615,7 @@ namespace Lampac
         #region OnShutdown
         void OnShutdown()
         {
-            if (AppReload._reload)
+            if (Program._reload)
                 return;
 
             IsShutdown = true;

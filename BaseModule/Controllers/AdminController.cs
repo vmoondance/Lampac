@@ -503,8 +503,6 @@ namespace Lampac.Controllers
 
                     string sharedBlock = $@"<div class=""block""><b>Авторизация в Lampa</b><br /><br />
                             Пароль: {shared_passwd}
-                            <br><br>
-                            Отключить авторизацию можно в init.conf (accsdb) или {host}/admin (пользователи) 
                         </div><hr />";
                     #endregion
 
