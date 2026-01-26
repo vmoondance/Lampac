@@ -19,11 +19,15 @@ namespace Shared
 
         public static IMemoryCache memoryCache { get; private set; }
 
-        public static void Configure(AppReload reload, IApplicationBuilder app, IMemoryCache mem, INws nws, ISoks ws)
+        public static void Configure(AppReload reload, INws nws, ISoks ws)
         {
             appReload = reload;
             Nws = nws;
             WS = ws;
+        }
+
+        public static void Configure(IApplicationBuilder app, IMemoryCache mem)
+        {
             ApplicationServices = app.ApplicationServices;
             memoryCache = mem;
         }

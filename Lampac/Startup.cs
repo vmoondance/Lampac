@@ -254,6 +254,8 @@ namespace Lampac
             #endregion
 
             ModuleRepository.Configuration(mvcBuilder);
+
+            Shared.Startup.Configure(Program.appReload, new NativeWebSocket(), new soks());
             BaseModControllers(mvcBuilder);
 
             #region compilation modules
@@ -429,7 +431,7 @@ namespace Lampac
                 SyncUserContext.Factory = app.ApplicationServices.GetService<IDbContextFactory<SyncUserContext>>();
             #endregion
 
-            Shared.Startup.Configure(Program.appReload, app, memory, new NativeWebSocket(), new soks());
+            Shared.Startup.Configure(app, memory);
             HybridCache.Configure(memory);
             HybridFileCache.Configure(memory);
             ProxyManager.Configure(memory);

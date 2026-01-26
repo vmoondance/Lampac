@@ -297,8 +297,6 @@ namespace Shared
             if (modules != null)
                 return;
 
-            modules = null;
-
             if (File.Exists("module/manifest.json"))
             {
                 var jss = new JsonSerializerSettings { Error = (se, ev) => 
