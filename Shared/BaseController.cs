@@ -767,6 +767,15 @@ namespace Shared
 
                     _cache.infile = $"{kit.path}/{CrypTo.md5(requestInfo.user_uid)}";
 
+                    if (kit.AesGcm)
+                    {
+                        if (string.IsNullOrEmpty(requestInfo.AesGcmKey))
+                            return null;
+
+                        string _md5key = CrypTo.md5(requestInfo.AesGcmKey);
+                        _cache.infile = $"{kit.path}/{_md5key[0]}/{_md5key}";
+                    }
+
                     if (kit.eval_path != null)
                         _cache.infile = CSharpEval.Execute<string>(kit.eval_path, new KitConfEvalPath(kit.path, requestInfo.user_uid));
 
@@ -781,9 +790,6 @@ namespace Shared
 
                     if (kit.AesGcm)
                     {
-                        if (string.IsNullOrEmpty(requestInfo.AesGcmKey))
-                            return null;
-
                         json = CryptoKit.Read(requestInfo.AesGcmKey, _cache.infile);
                     }
                     else
