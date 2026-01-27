@@ -12,6 +12,34 @@ namespace Shared.Engine
             return Convert.ToBase64String(key);
         }
 
+        public static bool TestKey(string keyBase64)
+        {
+            try
+            {
+                byte[] key = Convert.FromBase64String(keyBase64);
+
+                byte[] nonce = RandomBytes(12);
+                byte[] plaintext = Encoding.UTF8.GetBytes("test");
+
+                byte[] ciphertext = new byte[plaintext.Length];
+                byte[] tag = new byte[16];
+
+                using (var aes = new AesGcm(key, 16))
+                {
+                    aes.Encrypt(nonce, plaintext, ciphertext, tag);
+
+                    byte[] decrypted = new byte[ciphertext.Length];
+                    aes.Decrypt(nonce, ciphertext, tag, decrypted);
+
+                    return Encoding.UTF8.GetString(decrypted) == "test";
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool Write(string keyBase64, string json, string filePath)
         {
             try
