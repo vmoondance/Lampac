@@ -1005,7 +1005,7 @@ namespace Shared
                 else
                 {
                     init.rhub = true;
-                    init.rhub_fallback = true;
+                    init.rhub_fallback = false;
                 }
 
                 if (init.rhub)

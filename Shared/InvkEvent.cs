@@ -222,6 +222,7 @@ namespace Shared
 
             Invoke(conf?.LoadKit, model, ScriptOptions.Default
                 .AddReferences(CSharpEval.ReferenceFromFile("Shared.dll")).AddImports("Shared.Models.Base")
+                .AddReferences(CSharpEval.ReferenceFromFile("Newtonsoft.Json.dll")).AddImports("Newtonsoft.Json").AddImports("Newtonsoft.Json.Linq")
                 .AddReferences(typeof(File).Assembly).AddImports("System.IO"));
         }
         #endregion
