@@ -790,7 +790,7 @@ namespace Shared
 
                     if (kit.AesGcm)
                     {
-                        json = CryptoKit.Read(requestInfo.AesGcmKey, _cache.infile);
+                        json = CryptoKit.ReadFile(requestInfo.AesGcmKey, _cache.infile);
                     }
                     else
                     {
@@ -851,7 +851,7 @@ namespace Shared
                         return null;
 
                     if (kit.AesGcm)
-                        json = CryptoKit.Read(requestInfo.AesGcmKey, Encoding.UTF8.GetBytes(json));
+                        json = CryptoKit.Read(requestInfo.AesGcmKey, json);
 
                     if (!json.TrimStart().StartsWith("{"))
                         json = "{" + json + "}";
